@@ -34,10 +34,20 @@ use Psr\Log\LogLevel;
 class LinkedIn
 {
     public int $counter = 0;
+
+    public int $documentCounter = 0;
+
     public bool $poorManCron = false;
+
     private int $maxPosts = 100;
+
     private bool $debug = false;
+
     private bool $ignoreInterval = false;
+
+    private bool $importDocuments = true;
+
+    private bool $backfillDocuments = false;
 
     /**
      * @throws Exception
@@ -69,6 +79,7 @@ class LinkedIn
         }
 
         $this->counter = 0;
+        $this->documentCounter = 0;
 
         foreach ($objSocialFeed as $account) {
             $this->counter = 0;
@@ -82,6 +93,7 @@ class LinkedIn
             if ('' === $lastImport) {
                 $lastImport = 0;
             }
+
             $interval = time() - $lastImport;
 
             if (($interval >= $cron && 'no_cronjob' !== $cron) || (0 === $lastImport && 'no_cronjob' !== $cron) || true === $this->ignoreInterval) {
@@ -92,33 +104,25 @@ class LinkedIn
                     $account->linkedin_client_secret
                 );
 
-                $client->setApiHeaders([
-                    'Content-Type' => 'application/json',
-                    'X-Restli-Protocol-Version' => '2.0.0', // use protocol v2
-                ]);
-
                 $client->setAccessToken($account->linkedin_access_token);
 
-                /*
-                if ($this->debug) {
-                    #dump('-- List organizationalEntityAcls');
-                    #$profile = $client->get('organizationalEntityAcls',['q' => 'roleAssignee']);
-                    #dump($profile);
-                }
-
-                if ($this->debug) {
-                    dump('-- List organizations');
-                    #$companyInfo = $client->get('organizations/'.$account->linkedin_company_id);
-                    dump($companyInfo);
-                }
-                */
-
-                // $client->setApiRoot('https://api.linkedin.com/rest/');
                 $client->setApiHeaders([
                     'Content-Type' => 'application/json',
                     'X-Restli-Protocol-Version' => '2.0.0', // use protocol v2,
                     'LinkedIn-Version' => '202306',
                 ]);
+
+                $documentImporter = null;
+
+                if ($this->importDocuments) {
+                    $documentImporter = new LinkedInDocumentImporter(
+                        $account->linkedin_client_id,
+                        $account->linkedin_client_secret,
+                        $account->linkedin_access_token,
+                        $account->linkedin_api_version
+                    );
+                    $documentImporter->setDebugMode($this->debug);
+                }
 
                 // get posts
                 $posts = $client->get(
@@ -140,10 +144,22 @@ class LinkedIn
                     // @todo import shared content only if wanted by user $account->linkedinImportSharedContent
 
                     // continue if news exists
-                    if (null !== NewsModel::findBy('social_feed_id', $element['id'])) {
+                    $existingNews = NewsModel::findOneBy('social_feed_id', $element['id']);
+
+                    if (null !== $existingNews) {
+                        // import documents for already imported posts (backfill)
+                        if (null !== $documentImporter && $this->backfillDocuments && empty($existingNews->social_feed_document)) {
+                            $imgPath = NewsImporter::createImageFolder($account->linkedin_company_id);
+
+                            if ($documentImporter->importForNews($existingNews, $element['id'], $imgPath)) {
+                                ++$this->documentCounter;
+                            }
+                        }
+
                         if ($this->debug) {
                             dump('ignore existing post '.$element['id']);
                         }
+
                         continue;
                     }
 
@@ -202,11 +218,28 @@ class LinkedIn
                     $importer->setNews($item);
                     $importer->execute($account->pdir_sf_fb_news_archive, $account);
 
+                    // import linked PDF documents (document / carousel posts)
+                    if (null !== $documentImporter && $this->isDocumentPost($element)) {
+                        $news = NewsModel::findOneBy('social_feed_id', $element['id']);
+
+                        if (null !== $news) {
+                            $imgPath = NewsImporter::createImageFolder($account->linkedin_company_id);
+
+                            if ($documentImporter->importForNews($news, $element['id'], $imgPath)) {
+                                ++$this->documentCounter;
+                            }
+                        }
+                    }
+
                     ++$this->counter;
                 }
 
                 if (0 < $this->counter) {
                     $logger->log(LogLevel::INFO, 'Social Feed (ID '.$account->id.'): LinkedIn - imported '.$this->counter.' items.', ['contao' => new ContaoContext(__METHOD__, 'INFO')]);
+                }
+
+                if (0 < $this->documentCounter) {
+                    $logger->log(LogLevel::INFO, 'Social Feed (ID '.$account->id.'): LinkedIn - imported '.$this->documentCounter.' documents.', ['contao' => new ContaoContext(__METHOD__, 'INFO')]);
                 }
             }
 
@@ -242,5 +275,39 @@ class LinkedIn
     public function setMaxPosts($maxPosts): void
     {
         $this->maxPosts = $maxPosts;
+    }
+
+    public function setImportDocuments(bool $flag): void
+    {
+        $this->importDocuments = $flag;
+    }
+
+    public function setBackfillDocuments(bool $flag): void
+    {
+        $this->backfillDocuments = $flag;
+    }
+
+    /**
+     * Checks whether a post may contain a document (PDF carousel).
+     * The ugcPosts API marks document posts as NATIVE_DOCUMENT. For unknown categories the Posts API is asked,
+     * the document importer simply returns null for posts without a document.
+     */
+    private function isDocumentPost(array $element): bool
+    {
+        $shareContent = $element['specificContent']['com.linkedin.ugc.ShareContent'] ?? [];
+        $category = (string) ($shareContent['shareMediaCategory'] ?? '');
+
+        if ('NATIVE_DOCUMENT' === $category) {
+            return true;
+        }
+
+        foreach ($shareContent['media'] ?? [] as $media) {
+            if (str_contains((string) ($media['media'] ?? ''), 'urn:li:document:')) {
+                return true;
+            }
+        }
+
+        // text, image, article and video posts never contain a document
+        return !\in_array($category, ['NONE', 'IMAGE', 'ARTICLE', 'VIDEO', 'LIVE_VIDEO'], true);
     }
 }

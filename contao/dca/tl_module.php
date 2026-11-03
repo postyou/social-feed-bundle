@@ -22,7 +22,7 @@ declare(strict_types=1);
  * Add palette to tl_module
  */
 
-$GLOBALS['TL_DCA']['tl_module']['palettes']['newslist'] = str_replace('cssID', 'cssID;{pdir_sf_settings_legend},pdir_sf_text_length,pdir_sf_columns,pdir_sf_enableMasonry,pdir_sf_enableImages', $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist']);
+$GLOBALS['TL_DCA']['tl_module']['palettes']['newslist'] = str_replace('cssID', 'cssID;{pdir_sf_settings_legend},pdir_sf_text_length,pdir_sf_columns,pdir_sf_enableMasonry,pdir_sf_enableImages,pdir_sf_document_imgSize', $GLOBALS['TL_DCA']['tl_module']['palettes']['newslist']);
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['pdir_sf_text_length'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['pdir_sf_text_length'],
@@ -67,4 +67,23 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['pdir_sf_enableImages'] = [
         'tl_class' => 'w50 m12',
     ],
     'sql' => "char(1) NOT NULL default '1'",
+];
+
+// Image size of the LinkedIn document page previews (falls back to the module image size "imgSize")
+$GLOBALS['TL_DCA']['tl_module']['fields']['pdir_sf_document_imgSize'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['pdir_sf_document_imgSize'],
+    'exclude' => true,
+    'inputType' => 'imageSize',
+    'reference' => &$GLOBALS['TL_LANG']['MSC'],
+    'eval' => [
+        'rgxp' => 'natural',
+        'includeBlankOption' => true,
+        'nospace' => true,
+        'helpwizard' => true,
+        'tl_class' => 'w50 clr',
+    ],
+    'options_callback' => static function () {
+        return \Contao\System::getContainer()->get('contao.image.sizes')->getOptionsForUser(\Contao\BackendUser::getInstance());
+    },
+    'sql' => "varchar(255) NOT NULL default ''",
 ];

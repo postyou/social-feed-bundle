@@ -19,13 +19,14 @@ declare(strict_types=1);
  */
 
 $GLOBALS['TL_LANG']['tl_news']['sf_moderate'] = ['Import moderieren', 'Hier kannst du Beiträge von Instagram moderiert importieren.'];
-
 $GLOBALS['TL_LANG']['tl_news']['pdir_sf_settings_legend'] = 'Social Feed Einstellungen';
 $GLOBALS['TL_LANG']['tl_news']['social_feed_id'] = ['Social Feed Post-ID', 'Hier können Sie die ID des Social Feeds angeben.'];
 $GLOBALS['TL_LANG']['tl_news']['social_feed_type'] = ['Social Feed Typ', 'Hier können Sie den Typ des Social Feeds angeben.'];
 $GLOBALS['TL_LANG']['tl_news']['social_feed_account'] = ['Social Feed Account', 'Hier können Sie den Account des Social Feeds angeben.'];
 $GLOBALS['TL_LANG']['tl_news']['social_feed_account_picture'] = ['Social Feed Profilbild', 'Hier können Sie das Profilbild des social Feeds angeben.'];
-
+$GLOBALS['TL_LANG']['tl_news']['social_feed_document'] = ['Social Feed Dokument (PDF)', 'Das aus einem LinkedIn-Dokumentbeitrag importierte PDF. Die Seitenvorschauen werden beim ersten Aufruf im Frontend erzeugt.'];
+$GLOBALS['TL_LANG']['tl_news']['sf_document_download'] = 'PDF herunterladen';
+$GLOBALS['TL_LANG']['tl_news']['sf_document_pages'] = 'Dokumentseiten';
 $GLOBALS['TL_LANG']['tl_news']['moderate'] = ['Feed abrufen', 'Social Feed Einträge moderieren'];
 $GLOBALS['TL_LANG']['tl_news_moderate']['moderate'] = ['Feed abrufen', 'Social Feed Einträge moderieren'];
 $GLOBALS['TL_LANG']['tl_news_moderate']['moderateHint'] = 'Für den moderierten Import steht derzeit nur Instagram zur Verfügung. Nutze für andere Dienste den Import per Cron, die Einstellungen findest du in den Social Feed Konten.';

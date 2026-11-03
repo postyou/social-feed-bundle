@@ -39,7 +39,6 @@ ArrayUtil::arrayInsert($GLOBALS['TL_DCA']['tl_news']['list']['global_operations'
 /*
  * Add palette to tl_module
  */
-
 $GLOBALS['TL_DCA']['tl_news']['fields']['social_feed_id'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_news']['social_feed_id'],
     'exclude' => true,
@@ -98,6 +97,14 @@ $GLOBALS['TL_DCA']['tl_news']['fields']['social_feed_config'] = [
     'sql' => 'int(10) unsigned NULL',
 ];
 
+$GLOBALS['TL_DCA']['tl_news']['fields']['social_feed_document'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_news']['social_feed_document'],
+    'exclude' => true,
+    'inputType' => 'fileTree',
+    'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'extensions' => 'pdf', 'tl_class' => 'clr'],
+    'sql' => 'binary(16) NULL',
+];
+
 class tl_news_socialfeed extends Backend
 {
     /**
@@ -110,7 +117,7 @@ class tl_news_socialfeed extends Backend
     public function setSingleSrcFlags(mixed $varValue, DataContainer $dc): mixed
     {
         if ($dc->activeRecord) {
-           $GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['extensions'] = Config::get('validImageTypes');
+            $GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['extensions'] = Config::get('validImageTypes');
         }
 
         return $varValue;
@@ -128,6 +135,7 @@ foreach ($GLOBALS['TL_DCA']['tl_news']['palettes'] as $name => $palette) {
         ->addField('social_feed_id', 'social_feed_type', PaletteManipulator::POSITION_AFTER)
         ->addField('social_feed_account', 'social_feed_id', PaletteManipulator::POSITION_AFTER)
         ->addField('social_feed_account_picture', 'social_feed_account', PaletteManipulator::POSITION_AFTER)
+        ->addField('social_feed_document', 'social_feed_account_picture', PaletteManipulator::POSITION_AFTER)
         ->applyToPalette($name, 'tl_news')
     ;
 }

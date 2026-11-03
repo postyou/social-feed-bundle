@@ -76,6 +76,7 @@ $GLOBALS['TL_LANG']['tl_social_feed']['psfLabelNoAccount'] = 'No account specifi
 $GLOBALS['TL_LANG']['tl_social_feed']['psfLabelNoType'] = 'No type specified';
 $GLOBALS['TL_LANG']['tl_social_feed']['user'] = ['User', 'Please specify here which user should be set for newly imported messages'];
 $GLOBALS['TL_LANG']['tl_social_feed']['linkedinImportSharedContent'] = ['Import shared posts?', 'Enable to import shared posts from the company page.'];
+$GLOBALS['TL_LANG']['tl_social_feed']['linkedin_api_version'] = ['LinkedIn API version (document import)', 'Version of the LinkedIn Posts/Documents API in the format YYYYMM, e.g. 202610. LinkedIn supports each version for about 12 months. Leave empty to use the default version shipped with the bundle (placeholder).'];
 $GLOBALS['TL_LANG']['tl_social_feed']['noteForRefreshTokenMail'] = ['Note for Refresh Token E-Mail', 'Please specify here which domain or which note should be displayed in the Refresh Token E-Mail'];
 
 $GLOBALS['TL_LANG']['tl_social_feed']['setupWelcome'] = 'Social Feed Bundle';

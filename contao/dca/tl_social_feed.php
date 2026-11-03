@@ -23,6 +23,7 @@ use Contao\DC_Table;
 use Contao\System;
 use Pdir\SocialFeedBundle\EventListener\DataContainer\SetupListener;
 use Pdir\SocialFeedBundle\EventListener\DataContainer\SocialFeedListener;
+use Pdir\SocialFeedBundle\Importer\LinkedInDocumentImporter;
 
 System::loadLanguageFile('tl_social_feed');
 
@@ -103,7 +104,7 @@ $GLOBALS['TL_DCA']['tl_social_feed'] = [
         'socialFeedType_Facebook' => ';{socialFeedAccountLegend},pdir_sf_fb_account,pdir_sf_fb_app_id,pdir_sf_fb_app_secret,pdir_sf_fb_access_token;{socialFeedImportLegend},pdir_sf_fb_news_archive,user,pdir_sf_fb_posts,pdir_sf_fb_news_cronjob,pdir_sf_fb_news_last_import_date;',
         'socialFeedType_Instagram' => ';{socialFeedAccountLegend},psf_instagramAppId,psf_instagramAppSecret,psf_instagramAccessToken,noteForRefreshTokenMail,access_token_expires;{socialFeedImportLegend},instagram_account,number_posts,pdir_sf_fb_news_archive,user,pdir_sf_fb_news_cronjob,pdir_sf_fb_news_last_import_date,psf_instagramImportMentions;{pdir_sf_account_image_legend},instagram_account_picture,instagram_account_picture_size;',
         'socialFeedType_Twitter' => ';{socialFeedAccountLegend},twitter_api_key,twitter_api_secret_key,twitter_access_token,twitter_access_token_secret,twitter_account;{socialFeedImportLegend},search,number_posts,pdir_sf_fb_news_archive,user,show_retweets,hashtags_link,show_reply,pdir_sf_fb_news_cronjob,pdir_sf_fb_news_last_import_date;',
-        'socialFeedType_LinkedIn' => ';{socialFeedAccountLegend},linkedin_client_id,linkedin_client_secret,linkedin_company_id,linkedin_access_token,access_token_expires,linkedin_refresh_token_expires,noteForRefreshTokenMail;{socialFeedImportLegend},pdir_sf_fb_news_archive,user,linkedinImportSharedContent,number_posts,pdir_sf_fb_news_cronjob,pdir_sf_fb_news_last_import_date;{pdir_sf_account_image_legend},linkedin_account_picture,linkedin_account_picture_size;',
+        'socialFeedType_LinkedIn' => ';{socialFeedAccountLegend},linkedin_client_id,linkedin_client_secret,linkedin_company_id,linkedin_access_token,access_token_expires,linkedin_refresh_token_expires,noteForRefreshTokenMail;{socialFeedImportLegend},pdir_sf_fb_news_archive,user,linkedinImportSharedContent,linkedin_api_version,number_posts,pdir_sf_fb_news_cronjob,pdir_sf_fb_news_last_import_date;{pdir_sf_account_image_legend},linkedin_account_picture,linkedin_account_picture_size;',
     ],
 
     'fields' => [
@@ -529,6 +530,20 @@ $GLOBALS['TL_DCA']['tl_social_feed'] = [
                 'tl_class' => 'w50 m12',
             ],
             'sql' => "char(1) NOT NULL default ''",
+        ],
+
+        'linkedin_api_version' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_social_feed']['linkedin_api_version'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => [
+                'rgxp' => 'digit',
+                'minlength' => 6,
+                'maxlength' => 6,
+                'placeholder' => LinkedInDocumentImporter::LINKEDIN_VERSION,
+                'tl_class' => 'w50',
+            ],
+            'sql' => "varchar(6) NOT NULL default ''",
         ],
 
         'user' => [

@@ -32,3 +32,4 @@ $GLOBALS['TL_LANG']['tl_module']['columns3'] = 'Dreispaltig';
 $GLOBALS['TL_LANG']['tl_module']['columns4'] = 'Vierspaltig';
 $GLOBALS['TL_LANG']['tl_module']['pdir_sf_columns'] = ['Anzahl der Spalten', 'Geben Sie hier die gewünschte Darstellung der Elemente aus.'];
 $GLOBALS['TL_LANG']['tl_module']['pdir_sf_enableImages'] = ['Bilder anzeigen', 'Wenn aktiv, werden die Bilder dargestellt.'];
+$GLOBALS['TL_LANG']['tl_module']['pdir_sf_document_imgSize'] = ['Bildgröße der Dokumentseiten', 'Bildgröße für die Seitenvorschauen von LinkedIn-Dokumentbeiträgen (PDF). Leer lassen, um die Bildgröße des Moduls zu verwenden.'];

@@ -32,3 +32,4 @@ $GLOBALS['TL_LANG']['tl_module']['columns3'] = 'three columns';
 $GLOBALS['TL_LANG']['tl_module']['columns4'] = 'four coumns';
 $GLOBALS['TL_LANG']['tl_module']['pdir_sf_columns'] = ['Number of columns', 'Here you can choose the number of columns for each element.'];
 $GLOBALS['TL_LANG']['tl_module']['pdir_sf_enableImages'] = ['Show images', 'When active, images are displayed.'];
+$GLOBALS['TL_LANG']['tl_module']['pdir_sf_document_imgSize'] = ['Image size of document pages', 'Image size for the page previews of LinkedIn document posts (PDF). Leave empty to use the image size of the module.'];

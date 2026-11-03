@@ -37,6 +37,7 @@ class LinkedInImportCron
         // run LinkedIn import
         $importer = new LinkedIn();
         $importer->setPoorManCronMode(true);
+        $importer->setBackfillDocuments(true);
         $importer->import();
     }
 }

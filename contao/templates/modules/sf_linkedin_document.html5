@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * LinkedIn document post (PDF carousel).
+ *
+ * The page previews are rendered as a slider using the Contao core slider markup
+ * (.content-slider + .slider-control). The slider is initialised by the core template
+ * js_slider.html5, which must be included in the page layout. Swipe shows exactly one
+ * slide at a time.
+ *
+ * Template variables (see SocialFeedNewsClass::addDocumentData()):
+ *  - sfDocument:            ['href', 'title', 'name', 'filesize', 'pageCount'] or null
+ *  - sfDocumentPages:       list of image template data (use with $this->insert('image', $page))
+ *  - sfDocumentLabels:      ['download', 'pages']
+ *  - sfDocumentSliderConfig: optional "delay,speed,startSlide,continuous" (same format as the core slider element)
+ */
+
+$pages = $this->sfDocumentPages ?? [];
+$pageCount = \count($pages);
+$sliderConfig = $this->sfDocumentSliderConfig ?? '0,300,0,0';
+
+?>
+<?php if ($pageCount > 0 || $this->sfDocument): ?>
+  <div class="sf-document">
+
+    <?php if ($pageCount > 1): ?>
+      <div class="sf-document__carousel">
+        <div class="sf-document__slider content-slider" data-config="<?= $sliderConfig ?>" aria-label="<?= $this->sfDocumentLabels['pages'] ?? '' ?>">
+          <div class="slider-wrapper">
+            <?php foreach ($pages as $i => $page): ?>
+              <div class="sf-document__page" data-page="<?= $i + 1 ?>">
+                <?php $this->insert('image', $page); ?>
+                <span class="sf-document__counter"><?= $i + 1 ?> / <?= $pageCount ?></span>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+        <!-- The arrows are laid over the image (see sf_document.css); the link texts stay for screen readers -->
+        <nav class="sf-document__control slider-control" aria-label="<?= $this->sfDocumentLabels['pages'] ?? '' ?>">
+          <a href="#" class="slider-prev"><span class="sf-document__sr-only"><?= $GLOBALS['TL_LANG']['MSC']['previous'] ?? 'Previous' ?></span></a>
+          <span class="slider-menu"></span>
+          <a href="#" class="slider-next"><span class="sf-document__sr-only"><?= $GLOBALS['TL_LANG']['MSC']['next'] ?? 'Next' ?></span></a>
+        </nav>
+      </div>
+    <?php elseif (1 === $pageCount): ?>
+      <div class="sf-document__page sf-document__page--single" data-page="1">
+        <?php $this->insert('image', $pages[0]); ?>
+      </div>
+    <?php endif; ?>
+
+    <?php if ($this->sfDocument): ?>
+      <p class="sf-document__download">
+        <a data-lightbox="<?= $this->sfDocument['name'] ?>" href="<?= $this->sfDocument['href'] ?>" title="<?= $this->sfDocument['title'] ?>" download>
+          <?= $this->sfDocumentLabels['download'] ?? 'PDF' ?>
+          <span class="sf-document__meta">(<?= $this->sfDocument['name'] ?><?php if ($this->sfDocument['filesize']): ?>, <?= $this->sfDocument['filesize'] ?><?php endif; ?>)</span>
+        </a>
+      </p>
+    <?php endif; ?>
+
+  </div>
+<?php endif; ?>

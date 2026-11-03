@@ -54,7 +54,9 @@ class LinkedInImportCommand extends Command
     protected function configure(): void
     {
         $this->addOption('max-posts', 'm', InputOption::VALUE_REQUIRED, 'The maximum number of posts to execute (default 100)', '100');
-        $this->addOption('enable-debug', 'd', InputArgument::OPTIONAL, "Log debug information to console");
+        $this->addOption('enable-debug', 'd', InputArgument::OPTIONAL, 'Log debug information to console');
+        $this->addOption('no-documents', null, InputOption::VALUE_NONE, 'Do not import PDF documents of document posts');
+        $this->addOption('backfill-documents', 'b', InputOption::VALUE_NONE, 'Import PDF documents for already imported posts');
     }
 
     /**
@@ -70,20 +72,25 @@ class LinkedInImportCommand extends Command
             $importer = new LinkedIn();
             $importer->setIgnoreInterval(true);
             $importer->setDebugMode((bool) $input->getOption('enable-debug'));
-            $importer->setMaxPosts((int) $input->getOption('max-posts')?? 100);
-            $strLog = $importer->import();
-
+            $importer->setMaxPosts((int) $input->getOption('max-posts') ?: 100);
+            $importer->setImportDocuments(!$input->getOption('no-documents'));
+            $importer->setBackfillDocuments((bool) $input->getOption('backfill-documents'));
+            $importer->import();
         } catch (InvalidArgumentException $e) {
             $output->writeln(sprintf('%s (see help social-feed:linkedin:import).', $e->getMessage()));
 
             return Command::FAILURE;
         }
 
-        if(0 < $importer->counter) {
-            $output->writeln('... imported ' . $importer->counter . ' items.');
+        if (0 < $importer->counter) {
+            $output->writeln('... imported '.$importer->counter.' items.');
         }
 
-        if (0 === $importer->counter) {
+        if (0 < $importer->documentCounter) {
+            $output->writeln('... imported '.$importer->documentCounter.' documents.');
+        }
+
+        if (0 === $importer->counter && 0 === $importer->documentCounter) {
             $output->writeln('... nothing to import');
         }
 
